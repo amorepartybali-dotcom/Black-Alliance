@@ -1047,3 +1047,18 @@ body.telegram-webapp .hero {
         padding-bottom: calc(80px + env(safe-area-inset-bottom));
     }
 }
+
+/* Large button variant */
+.btn-lg {
+    padding: 18px 40px;
+    font-size: 1.1rem;
+}
+
+/* Back button - show only in Telegram */
+.tg-back-btn {
+    display: none !important;
+}
+
+body.telegram-webapp .tg-back-btn {
+    display: inline-block !important;
+}
