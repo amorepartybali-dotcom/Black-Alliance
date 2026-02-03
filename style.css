@@ -640,11 +640,11 @@ img {
     }
 }
 
-/* Enhanced Animations with Stagger */
+/* Enhanced Animations with Stagger - TEMPORARILY DISABLED */
 .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    /* Original: opacity: 0; transform: translateY(30px); */
 }
 
 .fade-in.visible {
@@ -653,9 +653,9 @@ img {
 }
 
 .fade-in-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    /* Original: opacity: 0; transform: translateX(-50px); */
 }
 
 .fade-in-left.visible {
@@ -664,9 +664,9 @@ img {
 }
 
 .fade-in-right {
-    opacity: 0;
-    transform: translateX(50px);
-    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+    /* Original: opacity: 0; transform: translateX(50px); */
 }
 
 .fade-in-right.visible {
@@ -675,9 +675,9 @@ img {
 }
 
 .scale-in {
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    /* Original: opacity: 0; transform: scale(0.9); */
 }
 
 .scale-in.visible {
