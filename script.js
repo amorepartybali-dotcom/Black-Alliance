@@ -26,13 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Show MainButton for booking
-        tg.MainButton.setText('📞 Book via WhatsApp');
+        tg.MainButton.setText('✈️ Book via Telegram');
         tg.MainButton.color = '#FBBF24';
         tg.MainButton.textColor = '#0A192F';
         tg.MainButton.show();
 
         tg.MainButton.onClick(() => {
-            tg.openLink('https://wa.me/6281338266077?text=Hello! I want to book a yacht from Bali Marine');
+            tg.openLink('https://t.me/+6281338266077');
         });
 
         // Enable haptic feedback on button clicks

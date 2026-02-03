@@ -643,6 +643,47 @@ img {
     }
 }
 
+/* Floating Telegram Button */
+.telegram-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0088cc, #00aaff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
+    transition: all 0.3s ease;
+    z-index: 999;
+    animation: telegram-pulse 2s infinite;
+}
+
+.telegram-float:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 136, 204, 0.6);
+}
+
+.telegram-float svg {
+    width: 32px;
+    height: 32px;
+    fill: white;
+}
+
+@keyframes telegram-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 4px 25px rgba(0, 136, 204, 0.7);
+    }
+}
+
 /* Enhanced Animations with Stagger - TEMPORARILY DISABLED */
 .fade-in {
     opacity: 1 !important;
