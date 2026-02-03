@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Show MainButton for booking
-        tg.MainButton.setText('✈️ Book via Telegram');
+        tg.MainButton.setText('🛥️ Book via Telegram');
         tg.MainButton.color = '#FBBF24';
         tg.MainButton.textColor = '#0A192F';
         tg.MainButton.show();
