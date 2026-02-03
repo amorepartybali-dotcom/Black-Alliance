@@ -1,177 +1,203 @@
-// Language Handling Logic
+// Language Selection Logic
 function selectLanguage(lang) {
-    localStorage.setItem('language', lang);
+    localStorage.setItem('selectedLanguage', lang);
     const overlay = document.getElementById('language-overlay');
+
+    // Hide overlay with animation
     if (overlay) {
-        overlay.classList.add('hidden');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 500);
     }
 
-    // Redirect logic
-    const currentPath = window.location.pathname;
-    const isRuPage = currentPath.includes('_ru');
-    const isFleetPage = currentPath.includes('fleet');
+    redirectToLanguage(lang);
+}
 
-    if (lang === 'ru' && !isRuPage) {
-        if (isFleetPage) {
-            window.location.href = 'fleet_ru.html';
-        } else {
-            window.location.href = 'index_ru.html';
-        }
-    } else if (lang === 'en' && isRuPage) {
-        if (isFleetPage) {
-            window.location.href = 'fleet.html';
-        } else {
-            window.location.href = 'index.html';
-        }
+// Toggle Language Logic (Navbar Switch)
+function toggleLanguage(isRussian) {
+    const lang = isRussian ? 'ru' : 'en';
+    selectLanguage(lang);
+}
+
+function redirectToLanguage(lang) {
+    const currentPath = window.location.pathname;
+    const filename = currentPath.split('/').pop() || 'index.html';
+
+    let newFilename;
+
+    if (lang === 'ru') {
+        if (filename === 'index.html' || filename === '') newFilename = 'index_ru.html';
+        else if (filename === 'fleet.html') newFilename = 'fleet_ru.html';
+        else if (filename.endsWith('_ru.html')) return; // Already on RU
+        else newFilename = filename.replace('.html', '_ru.html');
+    } else {
+        if (filename === 'index_ru.html') newFilename = 'index.html';
+        else if (filename === 'fleet_ru.html') newFilename = 'fleet.html';
+        else if (!filename.endsWith('_ru.html')) return; // Already on EN
+        else newFilename = filename.replace('_ru.html', '.html');
+    }
+
+    // Only redirect if filename actually changed
+    if (newFilename && newFilename !== filename) {
+        window.location.href = newFilename;
     }
 }
 
+// Check saved language on load
 document.addEventListener('DOMContentLoaded', () => {
-    // Check Language Preference
-    const savedLang = localStorage.getItem('language');
+    const savedLang = localStorage.getItem('selectedLanguage');
     const overlay = document.getElementById('language-overlay');
     const currentPath = window.location.pathname;
-    const isRuPage = currentPath.includes('_ru');
+    const filename = currentPath.split('/').pop() || 'index.html';
 
-    if (!savedLang) {
+    // Set Toggle State based on current page/preference
+    const toggleCheckbox = document.getElementById('lang-toggle-checkbox');
+    if (toggleCheckbox) {
+        if (savedLang === 'ru' || filename.includes('_ru.html')) {
+            toggleCheckbox.checked = true;
+        } else {
+            toggleCheckbox.checked = false;
+        }
+    }
+
+    if (!savedLang && overlay) {
         // First visit - show overlay
-        if (overlay) overlay.classList.remove('hidden');
-    } else {
-        // Preference exists - hide overlay and redirect if needed
-        if (overlay) overlay.classList.add('hidden');
+        overlay.style.display = 'flex';
+    } else if (savedLang && overlay) {
+        // Already selected - hide overlay immediately
+        overlay.style.display = 'none';
 
-        if (savedLang === 'ru' && !isRuPage) {
-            selectLanguage('ru');
-        } else if (savedLang === 'en' && isRuPage) {
-            selectLanguage('en');
+        // Redirect if on wrong language page (optional strict enforcement)
+        // But better to just let user browse if they manually navigated
+    }
+}
+
+console.log('Black Alliance Website Loaded');
+
+// =========================================
+// Telegram Mini App Integration
+// =========================================
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+    // Initialize Telegram WebApp
+    tg.ready();
+    tg.expand(); // Expand to full height
+
+    // Add class to body for CSS targeting
+    document.body.classList.add('telegram-webapp');
+
+    // Apply Telegram theme colors
+    const root = document.documentElement;
+    if (tg.themeParams) {
+        if (tg.themeParams.bg_color) {
+            root.style.setProperty('--tg-bg-color', tg.themeParams.bg_color);
+        }
+        if (tg.themeParams.text_color) {
+            root.style.setProperty('--tg-text-color', tg.themeParams.text_color);
         }
     }
 
-    console.log('Black Alliance Website Loaded');
+    // Show MainButton for booking
+    tg.MainButton.setText('🛥️ Book via Telegram');
+    tg.MainButton.color = '#FBBF24';
+    tg.MainButton.textColor = '#0A192F';
+    tg.MainButton.show();
 
-    // =========================================
-    // Telegram Mini App Integration
-    // =========================================
-    const tg = window.Telegram?.WebApp;
+    tg.MainButton.onClick(() => {
+        tg.openLink('https://t.me/+6281338266077');
+    });
 
-    if (tg) {
-        // Initialize Telegram WebApp
-        tg.ready();
-        tg.expand(); // Expand to full height
-
-        // Add class to body for CSS targeting
-        document.body.classList.add('telegram-webapp');
-
-        // Apply Telegram theme colors
-        const root = document.documentElement;
-        if (tg.themeParams) {
-            if (tg.themeParams.bg_color) {
-                root.style.setProperty('--tg-bg-color', tg.themeParams.bg_color);
+    // Enable haptic feedback on button clicks
+    document.querySelectorAll('.btn, .fleet-btn, .book-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('light');
             }
-            if (tg.themeParams.text_color) {
-                root.style.setProperty('--tg-text-color', tg.themeParams.text_color);
+        });
+    });
+
+    console.log('Telegram Mini App initialized');
+}
+
+// Mobile Menu Toggle
+const mobileBtn = document.querySelector('.mobile-menu-btn');
+const navLinks = document.querySelector('.nav-links');
+
+if (mobileBtn) {
+    mobileBtn.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+    });
+}
+
+// Smooth scrolling for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (href !== '#') {
+            e.preventDefault();
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+                if (navLinks) navLinks.classList.remove('active');
             }
         }
-
-        // Show MainButton for booking
-        tg.MainButton.setText('🛥️ Book via Telegram');
-        tg.MainButton.color = '#FBBF24';
-        tg.MainButton.textColor = '#0A192F';
-        tg.MainButton.show();
-
-        tg.MainButton.onClick(() => {
-            tg.openLink('https://t.me/+6281338266077');
-        });
-
-        // Enable haptic feedback on button clicks
-        document.querySelectorAll('.btn, .fleet-btn, .book-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-            });
-        });
-
-        console.log('Telegram Mini App initialized');
-    }
-
-    // Mobile Menu Toggle
-    const mobileBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-
-    if (mobileBtn) {
-        mobileBtn.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-    }
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (href !== '#') {
-                e.preventDefault();
-                const target = document.querySelector(href);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                    if (navLinks) navLinks.classList.remove('active');
-                }
-            }
-        });
     });
+});
 
-    // Navbar Scroll Effect
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(10, 25, 47, 0.95)';
-                navbar.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
-            } else {
-                navbar.style.background = 'rgba(10, 25, 47, 0.85)';
-                navbar.style.boxShadow = 'none';
-            }
-        });
-    }
-
-    // Enhanced Scroll Animations with Stagger Effect
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
-        });
-    }, observerOptions);
-
-    // Apply stagger delays to fleet cards
-    document.querySelectorAll('.fleet-card').forEach((el, index) => {
-        el.classList.add('fade-in');
-        el.classList.add(`delay-${(index % 6) + 1}`);
-        observer.observe(el);
+// Navbar Scroll Effect
+const navbar = document.querySelector('.navbar');
+if (navbar) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.style.background = 'rgba(10, 25, 47, 0.95)';
+            navbar.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1)';
+        } else {
+            navbar.style.background = 'rgba(10, 25, 47, 0.85)';
+            navbar.style.boxShadow = 'none';
+        }
     });
+}
 
-    // Apply animations to other elements
-    document.querySelectorAll('.section-title, .section-subtitle, .service-item, .hero-title, .hero-subtitle, .hero-cta, .route-note').forEach(el => {
-        el.classList.add('fade-in');
-        observer.observe(el);
+// Enhanced Scroll Animations with Stagger Effect
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
     });
+}, observerOptions);
 
-    // Apply scale-in to alliance card
-    document.querySelectorAll('.card-glow').forEach(el => {
-        el.classList.add('scale-in');
-        observer.observe(el);
-    });
+// Apply stagger delays to fleet cards
+document.querySelectorAll('.fleet-card').forEach((el, index) => {
+    el.classList.add('fade-in');
+    el.classList.add(`delay-${(index % 6) + 1}`);
+    observer.observe(el);
+});
 
-    // ===== LIGHTBOX GALLERY =====
-    // Create lightbox elements
-    const lightbox = document.createElement('div');
-    lightbox.className = 'lightbox';
-    lightbox.innerHTML = `
+// Apply animations to other elements
+document.querySelectorAll('.section-title, .section-subtitle, .service-item, .hero-title, .hero-subtitle, .hero-cta, .route-note').forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+});
+
+// Apply scale-in to alliance card
+document.querySelectorAll('.card-glow').forEach(el => {
+    el.classList.add('scale-in');
+    observer.observe(el);
+});
+
+// ===== LIGHTBOX GALLERY =====
+// Create lightbox elements
+const lightbox = document.createElement('div');
+lightbox.className = 'lightbox';
+lightbox.innerHTML = `
         <div class="lightbox-content">
             <button class="lightbox-close">×</button>
             <button class="lightbox-nav lightbox-prev">‹</button>
@@ -180,80 +206,80 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="lightbox-caption"></div>
         </div>
     `;
-    document.body.appendChild(lightbox);
+document.body.appendChild(lightbox);
 
-    const lightboxImg = lightbox.querySelector('img');
-    const lightboxCaption = lightbox.querySelector('.lightbox-caption');
-    const lightboxClose = lightbox.querySelector('.lightbox-close');
-    const lightboxPrev = lightbox.querySelector('.lightbox-prev');
-    const lightboxNext = lightbox.querySelector('.lightbox-next');
+const lightboxImg = lightbox.querySelector('img');
+const lightboxCaption = lightbox.querySelector('.lightbox-caption');
+const lightboxClose = lightbox.querySelector('.lightbox-close');
+const lightboxPrev = lightbox.querySelector('.lightbox-prev');
+const lightboxNext = lightbox.querySelector('.lightbox-next');
 
-    let currentImages = [];
-    let currentIndex = 0;
+let currentImages = [];
+let currentIndex = 0;
 
-    // Collect all fleet images
-    function collectImages() {
-        currentImages = [];
-        document.querySelectorAll('.fleet-image img').forEach((img, index) => {
-            currentImages.push({
-                src: img.src,
-                alt: img.alt,
-                index: index
-            });
+// Collect all fleet images
+function collectImages() {
+    currentImages = [];
+    document.querySelectorAll('.fleet-image img').forEach((img, index) => {
+        currentImages.push({
+            src: img.src,
+            alt: img.alt,
+            index: index
         });
-    }
-
-    // Open lightbox
-    function openLightbox(index) {
-        collectImages();
-        currentIndex = index;
-        updateLightboxImage();
-        lightbox.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    // Close lightbox
-    function closeLightbox() {
-        lightbox.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    // Update lightbox image
-    function updateLightboxImage() {
-        if (currentImages[currentIndex]) {
-            lightboxImg.src = currentImages[currentIndex].src;
-            lightboxCaption.textContent = currentImages[currentIndex].alt;
-        }
-    }
-
-    // Navigate lightbox
-    function navigateLightbox(direction) {
-        currentIndex += direction;
-        if (currentIndex < 0) currentIndex = currentImages.length - 1;
-        if (currentIndex >= currentImages.length) currentIndex = 0;
-        updateLightboxImage();
-    }
-
-    // Event listeners for fleet images
-    document.querySelectorAll('.fleet-image').forEach((fleetImage, index) => {
-        fleetImage.addEventListener('click', () => openLightbox(index));
     });
+}
 
-    // Lightbox controls
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
-    lightboxNext.addEventListener('click', () => navigateLightbox(1));
+// Open lightbox
+function openLightbox(index) {
+    collectImages();
+    currentIndex = index;
+    updateLightboxImage();
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
 
-    // Close on background click
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) closeLightbox();
-    });
+// Close lightbox
+function closeLightbox() {
+    lightbox.classList.remove('active');
+    document.body.style.overflow = '';
+}
 
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (!lightbox.classList.contains('active')) return;
-        if (e.key === 'Escape') closeLightbox();
-        if (e.key === 'ArrowLeft') navigateLightbox(-1);
-        if (e.key === 'ArrowRight') navigateLightbox(1);
-    });
+// Update lightbox image
+function updateLightboxImage() {
+    if (currentImages[currentIndex]) {
+        lightboxImg.src = currentImages[currentIndex].src;
+        lightboxCaption.textContent = currentImages[currentIndex].alt;
+    }
+}
+
+// Navigate lightbox
+function navigateLightbox(direction) {
+    currentIndex += direction;
+    if (currentIndex < 0) currentIndex = currentImages.length - 1;
+    if (currentIndex >= currentImages.length) currentIndex = 0;
+    updateLightboxImage();
+}
+
+// Event listeners for fleet images
+document.querySelectorAll('.fleet-image').forEach((fleetImage, index) => {
+    fleetImage.addEventListener('click', () => openLightbox(index));
+});
+
+// Lightbox controls
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxPrev.addEventListener('click', () => navigateLightbox(-1));
+lightboxNext.addEventListener('click', () => navigateLightbox(1));
+
+// Close on background click
+lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+});
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateLightbox(-1);
+    if (e.key === 'ArrowRight') navigateLightbox(1);
+});
 });
