@@ -1,5 +1,53 @@
+// Language Handling Logic
+function selectLanguage(lang) {
+    localStorage.setItem('language', lang);
+    const overlay = document.getElementById('language-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+
+    // Redirect logic
+    const currentPath = window.location.pathname;
+    const isRuPage = currentPath.includes('_ru');
+    const isFleetPage = currentPath.includes('fleet');
+
+    if (lang === 'ru' && !isRuPage) {
+        if (isFleetPage) {
+            window.location.href = 'fleet_ru.html';
+        } else {
+            window.location.href = 'index_ru.html';
+        }
+    } else if (lang === 'en' && isRuPage) {
+        if (isFleetPage) {
+            window.location.href = 'fleet.html';
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Bali Marine Website Loaded');
+    // Check Language Preference
+    const savedLang = localStorage.getItem('language');
+    const overlay = document.getElementById('language-overlay');
+    const currentPath = window.location.pathname;
+    const isRuPage = currentPath.includes('_ru');
+
+    if (!savedLang) {
+        // First visit - show overlay
+        if (overlay) overlay.classList.remove('hidden');
+    } else {
+        // Preference exists - hide overlay and redirect if needed
+        if (overlay) overlay.classList.add('hidden');
+
+        if (savedLang === 'ru' && !isRuPage) {
+            selectLanguage('ru');
+        } else if (savedLang === 'en' && isRuPage) {
+            selectLanguage('en');
+        }
+    }
+
+    console.log('Black Alliance Website Loaded');
 
     // =========================================
     // Telegram Mini App Integration
