@@ -1,6 +1,52 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Bali Marine Website Loaded');
 
+    // =========================================
+    // Telegram Mini App Integration
+    // =========================================
+    const tg = window.Telegram?.WebApp;
+
+    if (tg) {
+        // Initialize Telegram WebApp
+        tg.ready();
+        tg.expand(); // Expand to full height
+
+        // Add class to body for CSS targeting
+        document.body.classList.add('telegram-webapp');
+
+        // Apply Telegram theme colors
+        const root = document.documentElement;
+        if (tg.themeParams) {
+            if (tg.themeParams.bg_color) {
+                root.style.setProperty('--tg-bg-color', tg.themeParams.bg_color);
+            }
+            if (tg.themeParams.text_color) {
+                root.style.setProperty('--tg-text-color', tg.themeParams.text_color);
+            }
+        }
+
+        // Show MainButton for booking
+        tg.MainButton.setText('📞 Book via WhatsApp');
+        tg.MainButton.color = '#FBBF24';
+        tg.MainButton.textColor = '#0A192F';
+        tg.MainButton.show();
+
+        tg.MainButton.onClick(() => {
+            tg.openLink('https://wa.me/6281338266077?text=Hello! I want to book a yacht from Bali Marine');
+        });
+
+        // Enable haptic feedback on button clicks
+        document.querySelectorAll('.btn, .fleet-btn, .book-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            });
+        });
+
+        console.log('Telegram Mini App initialized');
+    }
+
     // Mobile Menu Toggle
     const mobileBtn = document.querySelector('.mobile-menu-btn');
     const navLinks = document.querySelector('.nav-links');

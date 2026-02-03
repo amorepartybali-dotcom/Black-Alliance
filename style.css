@@ -1010,3 +1010,40 @@ img {
         left: 0%;
     }
 }
+
+/* =========================================
+   Telegram Mini App Styles
+   ========================================= */
+
+/* Telegram theme variables fallback */
+:root {
+    --tg-bg-color: var(--color-bg);
+    --tg-text-color: var(--color-text);
+}
+
+/* Hide elements not needed in Telegram Mini App */
+body.telegram-webapp .navbar {
+    display: none;
+}
+
+body.telegram-webapp .footer {
+    padding-bottom: 80px;
+    /* Space for MainButton */
+}
+
+/* Telegram-specific adjustments */
+body.telegram-webapp {
+    padding-top: 0;
+}
+
+body.telegram-webapp .hero {
+    min-height: auto;
+    padding-top: 40px;
+}
+
+/* Safe area for iOS in Telegram */
+@supports (padding: env(safe-area-inset-bottom)) {
+    body.telegram-webapp .footer {
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+    }
+}
